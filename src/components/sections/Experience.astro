@@ -1,0 +1,155 @@
+---
+import Section from '@/components/Section.astro';
+import { experience } from '@/data/experience';
+import { getDictionary, sectionId, type Locale } from '@/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const dict = getDictionary(lang);
+---
+
+<Section id={sectionId(lang, 'experience')} sectionKey="experience" index="03" title={dict.experience.title}>
+  <div class="timeline" data-timeline>
+    <svg class="rail" aria-hidden="true">
+      <line class="rail-bg" x1="1" y1="0" x2="1" y2="100%"></line>
+      <line class="rail-fg" x1="1" y1="0" x2="1" y2="100%" pathLength="1" data-timeline-line></line>
+    </svg>
+
+    <ol>
+      {experience.map((entry) => {
+        const item = dict.experience.items[entry.id];
+        return (
+          <li class="entry is-lit" data-timeline-entry>
+            <span class="node" aria-hidden="true" />
+            <p class="mono when" data-reveal>
+              {entry.year}
+            </p>
+            <div class="body">
+              <h3 data-reveal>
+                {item.title}
+                <span class="org mono">{item.org}</span>
+              </h3>
+              <ul>
+                {item.bullets.map((bullet, index) => (
+                  <li data-reveal style={`--reveal-delay:${(index + 1) * 80}ms`}>
+                    {bullet}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  </div>
+</Section>
+
+<style>
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+  .rail {
+    position: absolute;
+    top: 0.6rem;
+    bottom: 0;
+    left: 0.3125rem;
+    width: 2px;
+    height: calc(100% - 0.6rem);
+    overflow: visible;
+  }
+  .rail line {
+    stroke-width: 1.5;
+  }
+  .rail-bg {
+    stroke: var(--color-line);
+  }
+  .rail-fg {
+    stroke: var(--color-accent);
+    stroke-dasharray: 1;
+    stroke-dashoffset: var(--offset, 0);
+  }
+  ol {
+    display: grid;
+    gap: clamp(3rem, 6vw, 5rem);
+  }
+  .entry {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .node {
+    position: absolute;
+    top: 0.3rem;
+    left: -2rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 1.5px solid var(--color-line-strong);
+    border-radius: 50%;
+    background: var(--color-bg);
+    transition:
+      border-color var(--dur-base) var(--ease-out),
+      background-color var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+  }
+  .entry.is-lit .node {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    box-shadow: 0 0 0 5px color-mix(in oklch, var(--color-accent) 22%, transparent);
+    transform: scale(1.1);
+  }
+  .when {
+    color: var(--color-accent-text);
+  }
+  h3 {
+    display: grid;
+    gap: 0.5rem;
+    font-size: var(--step-3);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+  .org {
+    color: var(--color-muted);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .body ul {
+    display: grid;
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--color-line);
+  }
+  .body li {
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-line);
+    color: var(--color-soft);
+    max-width: 46rem;
+  }
+
+  @media (min-width: 64rem) {
+    .timeline {
+      padding-left: 0;
+    }
+    .rail {
+      left: calc((100% - 11 * clamp(1rem, 2vw, 2rem)) / 12 * 2 + 2 * clamp(1rem, 2vw, 2rem));
+    }
+    .entry {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: clamp(1rem, 2vw, 2rem);
+    }
+    .when {
+      grid-column: 1 / span 2;
+      padding-top: 0.6rem;
+    }
+    .body {
+      grid-column: 4 / span 8;
+    }
+    .node {
+      left: calc((100% - 11 * clamp(1rem, 2vw, 2rem)) / 12 * 2 + 2 * clamp(1rem, 2vw, 2rem) - 0.3125rem);
+      top: 0.9rem;
+    }
+  }
+</style>

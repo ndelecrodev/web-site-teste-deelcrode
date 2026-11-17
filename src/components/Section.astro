@@ -1,0 +1,100 @@
+---
+import SplitText from './SplitText.astro';
+
+interface Props {
+  id: string;
+  /** Chave estável da seção, igual nos dois idiomas (usada pelo scrollspy e pela troca de idioma). */
+  sectionKey: string;
+  index: string;
+  title: string;
+  intro?: string;
+  class?: string;
+}
+
+const { id, sectionKey, index, title, intro, class: className } = Astro.props;
+const headingId = `${id}-title`;
+---
+
+<section
+  id={id}
+  class:list={['section', className]}
+  aria-labelledby={headingId}
+  data-section={sectionKey}
+  data-cv
+>
+  <div class="wrap">
+    <header class="head">
+      <p class="mono index" data-reveal>
+        <span class="num">{index}</span>
+        <span class="rule" aria-hidden="true"></span>
+        <span class="of">/ 06</span>
+      </p>
+      <h2 id={headingId} class="split" data-split>
+        <SplitText text={title} />
+      </h2>
+      {intro && (
+        <p class="intro" data-reveal style="--reveal-delay:120ms">
+          {intro}
+        </p>
+      )}
+    </header>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section {
+    position: relative;
+    padding-block: var(--section-y);
+  }
+  .head {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: clamp(2.5rem, 5vw, 5rem);
+  }
+  .index {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-muted);
+  }
+  .num {
+    color: var(--color-accent-text);
+  }
+  .rule {
+    flex: 0 1 6rem;
+    height: 0.5rem;
+    background: repeating-linear-gradient(to right, var(--color-line-strong) 0 1px, transparent 1px 0.5rem) 0
+      100% / 100% 100% no-repeat;
+    border-bottom: 1px solid var(--color-line-strong);
+  }
+  h2 {
+    font-size: var(--step-4);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 0.95;
+  }
+  .intro {
+    max-width: 34rem;
+    color: var(--color-soft);
+    font-size: var(--step-1);
+    line-height: 1.4;
+  }
+  @media (min-width: 64rem) {
+    .head {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: clamp(1rem, 2vw, 2rem);
+      align-items: end;
+    }
+    .index {
+      grid-column: 1 / -1;
+    }
+    h2 {
+      grid-column: 1 / span 7;
+    }
+    .intro {
+      grid-column: 9 / -1;
+      padding-bottom: 0.6rem;
+    }
+  }
+</style>

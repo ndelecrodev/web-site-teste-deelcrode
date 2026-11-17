@@ -1,0 +1,374 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Documentados em docs/design-system.md.
+ *
+ * Acento: vermelhão-laranja (oklch 0.7 0.19 42), a cor do lápis de marcação em desenho técnico e de
+ * um alerta que pede ação. Foge do azul/roxo padrão, contrasta com a base neutra nos dois temas e
+ * aparece só em ação, foco e dados-chave.
+ */
+@theme inline {
+  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+
+  --color-bg: var(--n-1);
+  --color-surface: var(--n-2);
+  --color-surface-2: var(--n-3);
+  --color-line: var(--n-4);
+  --color-line-strong: var(--n-5);
+  --color-faint: var(--n-6);
+  --color-muted: var(--n-7);
+  --color-soft: var(--n-8);
+  --color-fg: var(--n-9);
+  --color-strong: var(--n-10);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-ink: var(--accent-ink);
+  --color-ok: var(--ok);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+:root {
+  color-scheme: dark light;
+
+  /* Neutros: 10 passos. Escuro puxa para o frio (matiz 260), claro para o papel quente (matiz 85). */
+  --n-1: light-dark(oklch(0.972 0.008 85), oklch(0.165 0.006 260));
+  --n-2: light-dark(oklch(0.95 0.009 85), oklch(0.195 0.007 260));
+  --n-3: light-dark(oklch(0.925 0.01 85), oklch(0.225 0.008 260));
+  --n-4: light-dark(oklch(0.875 0.011 85), oklch(0.275 0.009 260));
+  --n-5: light-dark(oklch(0.78 0.012 85), oklch(0.36 0.01 260));
+  --n-6: light-dark(oklch(0.62 0.012 85), oklch(0.5 0.01 260));
+  --n-7: light-dark(oklch(0.47 0.012 85), oklch(0.68 0.01 260));
+  --n-8: light-dark(oklch(0.38 0.012 85), oklch(0.78 0.008 260));
+  --n-9: light-dark(oklch(0.24 0.012 85), oklch(0.9 0.006 260));
+  --n-10: light-dark(oklch(0.16 0.012 85), oklch(0.97 0.004 260));
+
+  --accent: oklch(0.7 0.19 42);
+  --accent-text: light-dark(oklch(0.5 0.17 38), oklch(0.76 0.16 48));
+  --accent-ink: oklch(0.17 0.03 45);
+  --ok: light-dark(oklch(0.48 0.13 155), oklch(0.8 0.17 155));
+
+  --shadow-raise: 0 24px 48px -28px light-dark(oklch(0.3 0.03 85 / 0.35), oklch(0 0 0 / 0.7));
+
+  --step--1: clamp(0.75rem, 0.73rem + 0.1vw, 0.8125rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.15rem, 1.05rem + 0.5vw, 1.45rem);
+  --step-2: clamp(1.45rem, 1.2rem + 1.2vw, 2.2rem);
+  --step-3: clamp(1.9rem, 1.4rem + 2.4vw, 3.4rem);
+  --step-4: clamp(2.6rem, 1.5rem + 5.2vw, 6.25rem);
+
+  --gutter: clamp(1.25rem, 0.6rem + 3vw, 3.5rem);
+  --container: 90rem;
+  --section-y: clamp(4.5rem, 3rem + 6vw, 8.5rem);
+  --header-h: 4.5rem;
+
+  --dur-micro: 150ms;
+  --dur-base: 400ms;
+  --dur-section: 850ms;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+@font-face {
+  font-family: 'Bricolage Fallback';
+  src: local('Arial');
+  size-adjust: 99%;
+  ascent-override: 93%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}
+
+@layer base {
+  html {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-display);
+    font-size: 100%;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+    font-optical-sizing: auto;
+    scrollbar-color: var(--color-line-strong) var(--color-bg);
+    scrollbar-width: thin;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html:not(.lenis) {
+      scroll-behavior: smooth;
+    }
+  }
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-size: var(--step-0);
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 650;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    color: var(--color-strong);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    padding: 0.1em 0.35em;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    overflow-wrap: anywhere;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .grid-12 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: clamp(1rem, 2vw, 2rem);
+  }
+  @media (min-width: 64rem) {
+    .grid-12 {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-feature-settings: 'zero', 'ss01';
+  }
+
+  .link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: 2.75rem;
+    color: var(--color-strong);
+    background: linear-gradient(currentColor, currentColor) 0 calc(100% - 0.55rem) / 100% 1px no-repeat;
+    transition:
+      background-size var(--dur-base) var(--ease-out),
+      color var(--dur-micro) var(--ease-out);
+  }
+  .link:hover {
+    color: var(--color-accent-text);
+    background-size: 0% 1px;
+    background-position: 100% calc(100% - 0.55rem);
+  }
+  .link .arrow {
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .link:hover .arrow {
+    transform: translate(3px, -3px);
+  }
+
+  .sr-only-focusable:not(:focus-visible) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ---------- Motion: estados iniciais só existem quando o JS adiciona `.motion` ao <html> ---------- */
+
+html.motion [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+  clip-path: inset(-1rem -1rem 18% -1rem);
+}
+html.motion [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(-1rem);
+  transition:
+    opacity var(--dur-section) var(--ease-out) var(--reveal-delay, 0ms),
+    transform var(--dur-section) var(--ease-out) var(--reveal-delay, 0ms),
+    clip-path var(--dur-section) var(--ease-out) var(--reveal-delay, 0ms);
+}
+html.motion [data-reveal].is-done {
+  clip-path: none;
+  transition: none;
+}
+
+.split .w {
+  display: inline-block;
+  overflow: clip;
+  overflow-clip-margin: 0.08em;
+  vertical-align: top;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+.split .wi {
+  display: inline-block;
+}
+html.motion .split .wi {
+  transform: translate3d(0, 110%, 0);
+}
+html.motion .split.is-in .wi {
+  transform: none;
+  transition: transform var(--dur-section) var(--ease-expo) calc(var(--wi, 0) * 70ms);
+}
+
+@keyframes line-up {
+  from {
+    transform: translate3d(0, 108%, 0);
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1rem, 0);
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  70%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+html.theme-switching::view-transition-old(root),
+html.theme-switching::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-switching::view-transition-new(root) {
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Camadas decorativas fixas ---------- */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.backdrop .cols {
+  position: absolute;
+  inset: 0;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.backdrop .cols::before {
+  content: '';
+  position: absolute;
+  inset: 0 var(--gutter);
+  background: repeating-linear-gradient(
+    to right,
+    var(--color-line) 0 1px,
+    transparent 1px calc((100% - 1px) / 4)
+  );
+  opacity: 0.45;
+}
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: url('/grain.svg') 0 0 / 220px 220px;
+  opacity: 0.06;
+  transform: translateZ(0);
+}
+
+@media print {
+  .backdrop,
+  .grain,
+  .cursor,
+  .progress,
+  .preloader {
+    display: none !important;
+  }
+}
+
+/* Seções fora da tela só entram no layout quando chegam perto da viewport ou são liberadas por layout.ts. */
+html.js:not(.cv-off) [data-cv] {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 56rem;
+}

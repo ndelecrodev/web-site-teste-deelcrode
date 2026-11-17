@@ -1,0 +1,16 @@
+---
+import type { HTMLTag } from 'astro/types';
+
+interface Props {
+  as?: HTMLTag;
+  /** Atraso em milissegundos, para cascata em listas e grids. */
+  delay?: number;
+  [attribute: string]: unknown;
+}
+
+const { as: Element = 'div', delay = 0, ...rest } = Astro.props;
+---
+
+<Element data-reveal style={delay ? `--reveal-delay:${delay}ms` : undefined} {...rest}>
+  <slot />
+</Element>

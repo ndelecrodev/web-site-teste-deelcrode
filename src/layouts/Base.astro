@@ -1,0 +1,213 @@
+---
+import '@/styles/global.css';
+import '@/styles/components.css';
+import displayFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
+import monoFont from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import BrandMark from '@/components/BrandMark.astro';
+import { SITE_URL, LINKEDIN_URL, site } from '@/data/site';
+import { getDictionary, htmlLang, localizePath, ogLocale, otherLocale, type Locale } from '@/i18n';
+
+interface Props {
+  lang: Locale;
+  /** Caminho lógico sem prefixo de idioma, por exemplo `/` ou `/cases/task-time-sync/`. */
+  path: string;
+  title?: string;
+  description?: string;
+  ogType?: 'website' | 'article';
+  onHome?: boolean;
+  indexable?: boolean;
+}
+
+const { lang, path, title, description, ogType = 'website', onHome = false, indexable = true } = Astro.props;
+
+const dict = getDictionary(lang);
+const other = otherLocale(lang);
+const pageTitle = title ?? dict.meta.title;
+const pageDescription = description ?? dict.meta.description;
+const canonical = new URL(localizePath(path, lang), SITE_URL).href;
+const alternate = localizePath(path, other);
+const ogImage = new URL(`/og-${lang}.png`, SITE_URL).href;
+
+const LATIN =
+  'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD';
+const fontFaces = `
+@font-face{font-family:'Bricolage Grotesque Variable';font-style:normal;font-display:swap;font-weight:200 800;src:url(${displayFont}) format('woff2-variations');unicode-range:${LATIN}}
+@font-face{font-family:'JetBrains Mono Variable';font-style:normal;font-display:swap;font-weight:100 800;src:url(${monoFont}) format('woff2-variations');unicode-range:${LATIN}}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': `${SITE_URL}/#person`,
+      name: site.name,
+      alternateName: site.shortName,
+      jobTitle: dict.meta.titleSuffix,
+      url: `${SITE_URL}/`,
+      image: ogImage,
+      sameAs: [site.github, LINKEDIN_URL].filter(Boolean),
+      knowsAbout: ['Python', 'FastAPI', 'Django', 'Java', 'Spring Boot', 'PostgreSQL', 'REST APIs'],
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: site.city,
+        addressRegion: site.region,
+        addressCountry: site.country,
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
+      name: site.shortName,
+      inLanguage: ['pt-BR', 'en'],
+      publisher: { '@id': `${SITE_URL}/#person` },
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={htmlLang[lang]} data-alt={indexable ? alternate : undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="author" content={site.name} />
+    {!indexable && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    {indexable && (
+      <>
+        <link rel="alternate" hreflang="pt-BR" href={new URL(localizePath(path, 'pt'), SITE_URL).href} />
+        <link rel="alternate" hreflang="en" href={new URL(localizePath(path, 'en'), SITE_URL).href} />
+        <link rel="alternate" hreflang="x-default" href={new URL(localizePath(path, 'pt'), SITE_URL).href} />
+      </>
+    )}
+    <meta name="theme-color" content="#0d0e11" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f8f5f0" media="(prefers-color-scheme: light)" />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.shortName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={dict.meta.ogAlt} />
+    <meta property="og:locale" content={ogLocale[lang]} />
+    <meta property="og:locale:alternate" content={ogLocale[other]} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={dict.meta.ogAlt} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <link rel="preload" href={displayFont} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monoFont} as="font" type="font/woff2" crossorigin />
+    <style is:inline set:html={fontFaces} />
+
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const read = (store, key) => {
+          try {
+            return store.getItem(key);
+          } catch {
+            return null;
+          }
+        };
+        root.classList.add('js');
+
+        const saved = read(localStorage, 'theme');
+        const prefersLight = matchMedia('(prefers-color-scheme: light)').matches;
+        root.dataset.theme = saved === 'light' || saved === 'dark' ? saved : prefersLight ? 'light' : 'dark';
+
+        const lang = read(localStorage, 'lang');
+        const current = root.lang.startsWith('en') ? 'en' : 'pt';
+        const fromThisSite = () => {
+          try {
+            return Boolean(document.referrer) && new URL(document.referrer).origin === location.origin;
+          } catch {
+            return false;
+          }
+        };
+        if (root.dataset.alt && (lang === 'pt' || lang === 'en') && lang !== current && !fromThisSite()) {
+          location.replace(root.dataset.alt + location.hash);
+          return;
+        }
+
+        if (location.hash) root.classList.add('cv-off');
+
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        root.classList.add('motion');
+        setTimeout(() => {
+          if (!window.__motionReady) root.classList.remove('motion');
+        }, 4000);
+
+        if (read(sessionStorage, 'intro') || location.hash) return;
+        try {
+          sessionStorage.setItem('intro', '1');
+        } catch {
+          return;
+        }
+        root.classList.add('preloading');
+        const end = () => {
+          root.classList.remove('preloading');
+          removeEventListener('pointerdown', end);
+          removeEventListener('keydown', end);
+        };
+        addEventListener('pointerdown', end);
+        addEventListener('keydown', end);
+        setTimeout(end, 1150);
+      })();
+    </script>
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">
+      {dict.a11y.skip}
+    </a>
+
+    <div class="preloader" aria-hidden="true">
+      <BrandMark drawable />
+    </div>
+
+    <div class="backdrop" aria-hidden="true">
+      <div class="cols"></div>
+    </div>
+    <div class="progress" aria-hidden="true">
+      <span></span>
+    </div>
+
+    <Header lang={lang} path={path} onHome={onHome} />
+
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <Footer lang={lang} onHome={onHome} />
+
+    <div class="grain" aria-hidden="true"></div>
+    <div class="cursor" aria-hidden="true"></div>
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
+
+    <script>
+      import '@/scripts/main';
+    </script>
+  </body>
+</html>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+</style>

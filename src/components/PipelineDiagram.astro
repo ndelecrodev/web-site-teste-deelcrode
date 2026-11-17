@@ -1,0 +1,103 @@
+---
+/* Diagrama "fonte → transformação → destino" do Task Time Sync. Decorativo: o texto equivalente está no card. */
+const sources = ['Jira', 'Clockify'];
+const targets = ['Excel', 'Postgres', 'Teams'];
+---
+
+<svg class="pipeline" viewBox="0 0 560 240" fill="none" aria-hidden="true" data-loop>
+  <g class="links">
+    <path d="M150 72H215Q235 72 235 92V100"></path>
+    <path d="M150 168H215Q235 168 235 148V140"></path>
+    <path d="M325 120H360Q380 120 380 100V68Q380 48 400 48H420"></path>
+    <path d="M325 120H420"></path>
+    <path d="M325 120H360Q380 120 380 140V172Q380 192 400 192H420"></path>
+  </g>
+  <g class="flow">
+    <path d="M150 72H215Q235 72 235 92V100"></path>
+    <path d="M150 168H215Q235 168 235 148V140"></path>
+    <path d="M325 120H360Q380 120 380 100V68Q380 48 400 48H420"></path>
+    <path d="M325 120H420"></path>
+    <path d="M325 120H360Q380 120 380 140V172Q380 192 400 192H420"></path>
+  </g>
+
+  {sources.map((name, index) => (
+    <g class="box">
+      <rect x="30" y={50 + index * 96} width="120" height="44" rx="4" />
+      <text x="90" y={77 + index * 96}>
+        {name}
+      </text>
+    </g>
+  ))}
+
+  <g class="box core">
+    <rect x="190" y="100" width="135" height="40" rx="4"></rect>
+    <text x="257.5" y="125">
+      pipeline
+    </text>
+  </g>
+
+  {targets.map((name, index) => (
+    <g class="box">
+      <rect x="420" y={26 + index * 72} width="110" height="44" rx="4" />
+      <text x="475" y={53 + index * 72}>
+        {name}
+      </text>
+    </g>
+  ))}
+</svg>
+
+<style>
+  .pipeline {
+    width: 100%;
+    height: auto;
+  }
+  .links path {
+    stroke: var(--color-line-strong);
+    stroke-width: 1;
+  }
+  .flow path {
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 4 14;
+    animation: flow 1.6s linear infinite;
+    animation-play-state: paused;
+  }
+  .pipeline:global(.is-visible) .flow path {
+    animation-play-state: running;
+  }
+  .box rect {
+    fill: var(--color-surface-2);
+    stroke: var(--color-line-strong);
+  }
+  .box text {
+    fill: var(--color-fg);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-anchor: middle;
+  }
+  @media (max-width: 40rem) {
+    .box text {
+      font-size: 19px;
+      translate: 0 2px;
+    }
+  }
+  .core rect {
+    fill: var(--color-accent);
+    stroke: var(--color-accent);
+  }
+  .core text {
+    fill: var(--color-accent-ink);
+    font-weight: 600;
+  }
+  @keyframes flow {
+    to {
+      stroke-dashoffset: -18;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flow {
+      display: none;
+    }
+  }
+</style>

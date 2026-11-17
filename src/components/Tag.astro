@@ -1,0 +1,17 @@
+---
+import TechIcon from './TechIcon.astro';
+import { getTech, type TechId } from '@/data/tech';
+
+interface Props {
+  tech?: TechId;
+  label: string;
+}
+
+const { tech, label } = Astro.props;
+const hasIcon = tech !== undefined && getTech(tech).icon !== undefined;
+---
+
+<span class="tag">
+  {tech && hasIcon && <TechIcon id={tech} />}
+  {label}
+</span>

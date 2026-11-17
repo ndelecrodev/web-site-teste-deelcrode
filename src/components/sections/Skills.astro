@@ -1,0 +1,150 @@
+---
+import Marquee from '@/components/Marquee.astro';
+import Section from '@/components/Section.astro';
+import Tag from '@/components/Tag.astro';
+import TechIcon from '@/components/TechIcon.astro';
+import { marqueeTech, skillGroups } from '@/data/skills';
+import { getTech, type TechId } from '@/data/tech';
+import { getDictionary, sectionId, type Locale } from '@/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const { skills } = getDictionary(lang);
+const label = (id: TechId): string => skills.techLabels[id] ?? getTech(id).name;
+---
+
+<Section
+  id={sectionId(lang, 'skills')}
+  sectionKey="skills"
+  index="02"
+  title={skills.title}
+  intro={skills.intro}
+>
+  <div class="index" role="list">
+    {skillGroups.map((group, index) => (
+      <div class="row" role="listitem" data-reveal style={`--reveal-delay:${index * 60}ms`}>
+        <span class="mono num" aria-hidden="true">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <h3>{skills.groups[group.id]}</h3>
+        <ul class="tags">
+          {group.tech.map((id) => (
+            <li>
+              <Tag tech={id} label={label(id)} />
+            </li>
+          ))}
+          {group.soft.map((id) => (
+            <li>
+              <Tag label={skills.soft[id]} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</Section>
+
+<div class="band" aria-label={skills.marquee} role="group" data-cv>
+  <Marquee duration={48}>
+    {marqueeTech.map((id) => (
+      <span class="item ti-host">
+        <TechIcon id={id} />
+        {getTech(id).name}
+        <span class="sep" aria-hidden="true">
+          /
+        </span>
+      </span>
+    ))}
+  </Marquee>
+</div>
+
+<style>
+  .index {
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 0.75rem 1rem;
+    padding-block: 1.5rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .row::before {
+    content: '';
+    position: absolute;
+    inset: 0 calc(var(--gutter) * -0.5);
+    z-index: -1;
+    background: var(--color-surface);
+    transform: scaleY(0);
+    transform-origin: 50% 100%;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .row:hover::before {
+    transform: scaleY(1);
+  }
+  .num {
+    padding-top: 0.35rem;
+    color: var(--color-accent-text);
+  }
+  h3 {
+    font-size: var(--step-1);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .tags {
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .band {
+    border-block: 1px solid var(--color-line);
+    padding-block: 1.1rem;
+  }
+  .item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding-left: 1.75rem;
+    color: var(--color-soft);
+    font-size: var(--step-1);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .item:hover {
+    color: var(--color-strong);
+  }
+  .item :global(.ti) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .sep {
+    padding-left: 1.75rem;
+    color: var(--color-line-strong);
+  }
+
+  @media (min-width: 64rem) {
+    .row {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: clamp(1rem, 2vw, 2rem);
+      align-items: baseline;
+    }
+    .num {
+      grid-column: 1;
+    }
+    h3 {
+      grid-column: 2 / span 3;
+    }
+    .tags {
+      grid-column: 5 / -1;
+    }
+  }
+</style>

@@ -1,0 +1,31 @@
+---
+import Base from '@/layouts/Base.astro';
+import About from './sections/About.astro';
+import Contact from './sections/Contact.astro';
+import Education from './sections/Education.astro';
+import Experience from './sections/Experience.astro';
+import Hero from './sections/Hero.astro';
+import Projects from './sections/Projects.astro';
+import Proofs from './sections/Proofs.astro';
+import Skills from './sections/Skills.astro';
+import TechSprite from './TechSprite.astro';
+import type { Locale } from '@/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+---
+
+<Base lang={lang} path="/" onHome>
+  <TechSprite />
+  <Hero lang={lang} />
+  <Proofs lang={lang} />
+  <About lang={lang} />
+  <Skills lang={lang} />
+  <Experience lang={lang} />
+  <Projects lang={lang} />
+  <Education lang={lang} />
+  <Contact lang={lang} />
+</Base>

@@ -1,0 +1,79 @@
+---
+import { site } from '@/data/site';
+import { getDictionary, localizePath, sectionId, sectionKeys, type Locale } from '@/i18n';
+
+interface Props {
+  lang: Locale;
+  onHome: boolean;
+}
+
+const { lang, onHome } = Astro.props;
+const dict = getDictionary(lang);
+const home = localizePath('/', lang);
+---
+
+<footer class="site-footer" data-cv>
+  <div class="wrap inner">
+    <nav aria-label={dict.a11y.sections}>
+      <ul class="mono">
+        {sectionKeys.map((key) => (
+          <li>
+            <a href={`${onHome ? '' : home}#${sectionId(lang, key)}`}>{dict.nav[key]}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div class="meta mono">
+      <span>{dict.footer.rights}</span>
+      <span>{dict.footer.place}</span>
+      <span class="coords">
+        {site.coordinates.lat} · {site.coordinates.lon}
+      </span>
+      <a class="top" href="#main">
+        {dict.footer.top} <span aria-hidden="true">↑</span>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--color-line);
+    padding-block: 2rem 2.5rem;
+    color: var(--color-muted);
+  }
+  .inner {
+    display: grid;
+    gap: 1.5rem;
+  }
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+  }
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  a:hover {
+    color: var(--color-strong);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 2rem;
+  }
+  .top {
+    margin-left: auto;
+    gap: 0.4rem;
+    color: var(--color-fg);
+  }
+  @media (max-width: 40rem) {
+    .coords {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,90 @@
+---
+import Reveal from '@/components/Reveal.astro';
+import Section from '@/components/Section.astro';
+import { getDictionary, sectionId, type Locale } from '@/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const { about } = getDictionary(lang);
+---
+
+<Section id={sectionId(lang, 'about')} sectionKey="about" index="01" title={about.title}>
+  <div class="grid-12 about">
+    <div class="text">
+      <Reveal as="p" class="lead">
+        {about.lead}
+      </Reveal>
+      <div class="body">
+        {about.body.map((paragraph, index) => (
+          <Reveal as="p" delay={(index + 1) * 90}>
+            {paragraph}
+          </Reveal>
+        ))}
+      </div>
+    </div>
+
+    <Reveal as="dl" class="facts" delay={150}>
+      {about.facts.map((fact) => (
+        <div>
+          <dt class="mono">{fact.key}</dt>
+          <dd>{fact.value}</dd>
+        </div>
+      ))}
+    </Reveal>
+  </div>
+</Section>
+
+<style>
+  .about {
+    row-gap: 3rem;
+  }
+  .text,
+  .facts {
+    grid-column: 1 / -1;
+  }
+  .lead {
+    color: var(--color-strong);
+    font-size: var(--step-2);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.22;
+  }
+  .body {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 40rem;
+    margin-top: 2rem;
+    color: var(--color-soft);
+  }
+  .facts {
+    align-self: start;
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .facts div {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+  dt {
+    color: var(--color-muted);
+  }
+  dd {
+    color: var(--color-fg);
+  }
+  @media (min-width: 64rem) {
+    .text {
+      grid-column: 1 / span 7;
+    }
+    .facts {
+      grid-column: 9 / -1;
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+    }
+  }
+</style>

@@ -1,0 +1,13 @@
+---
+interface Props {
+  drawable?: boolean;
+  class?: string;
+}
+const { drawable = false, class: className } = Astro.props;
+const pathLength = drawable ? 1 : undefined;
+---
+
+<svg class={className} viewBox="10 14 45 36" width="45" height="36" fill="none" aria-hidden="true">
+  <path d="M15 44V20l15 24V20" pathLength={pathLength}></path>
+  <path d="M35 20h15L35 44h15" pathLength={pathLength}></path>
+</svg>

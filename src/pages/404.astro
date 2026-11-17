@@ -1,0 +1,127 @@
+---
+import Base from '@/layouts/Base.astro';
+import Button from '@/components/Button.astro';
+import { getDictionary } from '@/i18n';
+
+const pt = getDictionary('pt').notFound;
+const en = getDictionary('en').notFound;
+---
+
+<Base lang="pt" path="/404/" title={`${pt.title} | Nicolas Zampieri`} indexable={false}>
+  <section class="nf">
+    <div class="wrap">
+      <p class="mono trace intro-fade" style="--i:0">
+        <span class="method">GET</span>
+        <span class="path" data-path>
+          /?
+        </span>
+        <span class="status">→ 404</span>
+      </p>
+      <h1 aria-label={pt.title}>
+        <span class="digit" style="--i:0" aria-hidden="true">
+          4
+        </span>
+        <span class="digit zero" style="--i:1" aria-hidden="true">
+          0
+        </span>
+        <span class="digit" style="--i:2" aria-hidden="true">
+          4
+        </span>
+      </h1>
+      <div class="copy">
+        <div class="intro-fade" style="--i:3">
+          <p class="line">{pt.line}</p>
+          <p class="text">{pt.text}</p>
+          <Button variant="primary" href="/" icon="arrow" magnetic>
+            {pt.cta}
+          </Button>
+        </div>
+        <div class="intro-fade" style="--i:4" lang="en">
+          <p class="line">{en.line}</p>
+          <p class="text">{en.text}</p>
+          <Button href="/en/" icon="arrow">
+            {en.cta}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const target = document.querySelector('[data-path]');
+  if (target) target.textContent = location.pathname.slice(0, 48);
+</script>
+
+<style>
+  .nf {
+    display: grid;
+    align-items: center;
+    min-height: 100svh;
+    padding-block: calc(var(--header-h) + 2rem) 4rem;
+  }
+  .trace {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    color: var(--color-muted);
+    overflow-wrap: anywhere;
+  }
+  .path {
+    text-transform: none;
+  }
+  .method {
+    color: var(--color-fg);
+  }
+  .status {
+    color: var(--color-accent-text);
+  }
+  h1 {
+    display: flex;
+    font-size: clamp(8rem, 2rem + 34vw, 30rem);
+    font-weight: 750;
+    letter-spacing: -0.07em;
+    line-height: 0.8;
+    margin-block: 0.08em 0.14em;
+    overflow: clip;
+  }
+  .digit {
+    display: inline-block;
+  }
+  .zero {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--color-accent);
+  }
+  :global(html.motion) .digit {
+    animation: line-up 1100ms var(--ease-expo) calc(100ms + var(--i) * 110ms) both;
+  }
+  :global(html.motion) .intro-fade {
+    animation: fade-up 900ms var(--ease-out) calc(300ms + var(--i) * 80ms) both;
+  }
+  .copy {
+    display: grid;
+    gap: 2.5rem;
+  }
+  .copy > div {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+    max-width: 28rem;
+  }
+  .line {
+    color: var(--color-strong);
+    font-size: var(--step-2);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .text {
+    margin-bottom: 0.75rem;
+    color: var(--color-soft);
+  }
+  @media (min-width: 48rem) {
+    .copy {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

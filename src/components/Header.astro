@@ -1,0 +1,387 @@
+---
+import BrandMark from './BrandMark.astro';
+import { site } from '@/data/site';
+import { getDictionary, localizePath, sectionId, sectionKeys, type Locale } from '@/i18n';
+
+interface Props {
+  lang: Locale;
+  path: string;
+  onHome: boolean;
+}
+
+const { lang, path, onHome } = Astro.props;
+const dict = getDictionary(lang);
+const home = localizePath('/', lang);
+const items = sectionKeys.map((key, index) => ({
+  key,
+  index: String(index + 1).padStart(2, '0'),
+  label: dict.nav[key],
+  href: `${onHome ? '' : home}#${sectionId(lang, key)}`,
+}));
+const langs = [
+  { code: 'pt', label: 'PT', name: 'Português', hreflang: 'pt-BR' },
+  { code: 'en', label: 'EN', name: 'English', hreflang: 'en' },
+] as const;
+---
+
+<header class="site-header" data-header>
+  <div class="wrap bar">
+    <a class="brand" href={onHome ? '#main' : home} aria-label={dict.a11y.home}>
+      <BrandMark class="brand-mark" />
+      <span class="brand-name">{site.shortName}</span>
+    </a>
+
+    <nav class="nav" aria-label={dict.a11y.sections} data-nav>
+      <ul>
+        {items.map((item) => (
+          <li>
+            <a href={item.href} data-nav-link={item.key}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <span class="nav-indicator" aria-hidden="true" data-nav-indicator></span>
+    </nav>
+
+    <div class="actions">
+      <div class="lang" role="group" aria-label={dict.a11y.language}>
+        {langs.map((item, index) => (
+          <>
+            {index > 0 && <span aria-hidden="true">|</span>}
+            <a
+              href={localizePath(path, item.code)}
+              hreflang={item.hreflang}
+              lang={item.code}
+              data-lang={item.code}
+              aria-current={item.code === lang ? 'true' : undefined}
+            >
+              {item.label}
+              <span class="sr-only"> · {item.name}</span>
+            </a>
+          </>
+        ))}
+      </div>
+
+      <button class="icon-btn theme" type="button" aria-label={dict.a11y.theme} data-theme-toggle>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle class="sun-core" cx="12" cy="12" r="4.2"></circle>
+          <g class="sun-rays">
+            <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M5.3 18.7l1.5-1.5M17.2 6.8l1.5-1.5"></path>
+          </g>
+          <path class="moon" d="M20.5 13.2A8.5 8.5 0 1 1 10.8 3.5a6.6 6.6 0 0 0 9.7 9.7z"></path>
+        </svg>
+      </button>
+
+      <button
+        class="icon-btn burger"
+        type="button"
+        aria-expanded="false"
+        aria-controls="menu"
+        aria-label={dict.a11y.menuOpen}
+        data-menu-toggle
+        data-label-open={dict.a11y.menuOpen}
+        data-label-close={dict.a11y.menuClose}
+      >
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="menu" id="menu" data-menu>
+  <nav class="wrap" aria-label={dict.a11y.sections}>
+    <ul>
+      {items.map((item, index) => (
+        <li style={`--i:${index}`}>
+          <a href={item.href} data-menu-link>
+            <span class="mono idx">{item.index}</span>
+            <span class="label">{item.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="mono menu-foot" style={`--i:${items.length}`}>
+      <span>{site.coordinates.lat}</span>
+      <span>{site.coordinates.lon}</span>
+    </p>
+  </nav>
+</div>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    height: var(--header-h);
+    border-bottom: 1px solid transparent;
+    transition:
+      background-color var(--dur-base) var(--ease-out),
+      border-color var(--dur-base) var(--ease-out),
+      backdrop-filter var(--dur-base) var(--ease-out);
+  }
+  .site-header.is-scrolled {
+    background: color-mix(in oklch, var(--color-bg) 78%, transparent);
+    border-color: var(--color-line);
+    backdrop-filter: blur(14px) saturate(1.2);
+  }
+  :global(html.menu-open) .site-header {
+    background: transparent;
+    border-color: transparent;
+    backdrop-filter: none;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    height: 100%;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 2.75rem;
+    color: var(--color-strong);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .brand :global(.brand-mark) {
+    width: 1.9rem;
+    height: auto;
+    stroke: currentColor;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .brand :global(.brand-mark path + path) {
+    stroke: var(--color-accent);
+  }
+  .brand-name {
+    display: none;
+  }
+
+  .nav {
+    position: relative;
+    display: none;
+  }
+  .nav ul {
+    display: flex;
+    gap: clamp(0.25rem, 1vw, 1rem);
+  }
+  .nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.6rem;
+    color: var(--color-muted);
+    font-size: 0.9375rem;
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .nav a:hover,
+  .nav a[aria-current='true'] {
+    color: var(--color-strong);
+  }
+  .nav-indicator {
+    position: absolute;
+    left: 0;
+    bottom: 0.45rem;
+    width: 1px;
+    height: 1px;
+    background: var(--color-accent);
+    transform: translateX(var(--x, 0px)) scaleX(var(--w, 0));
+    transform-origin: 0 50%;
+    transition: transform 500ms var(--ease-expo);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .lang {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--color-faint);
+  }
+  .lang a {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    color: var(--color-muted);
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .lang a:hover {
+    color: var(--color-strong);
+  }
+  .lang a[aria-current='true'] {
+    color: var(--color-accent-text);
+  }
+
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    color: var(--color-fg);
+    cursor: pointer;
+    transition:
+      background-color var(--dur-base) var(--ease-out),
+      color var(--dur-base) var(--ease-out);
+  }
+  .icon-btn:hover {
+    background: var(--color-surface-2);
+    color: var(--color-strong);
+  }
+
+  .theme svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .theme svg > * {
+    transform-box: view-box;
+    transform-origin: 50% 50%;
+    transition:
+      transform 500ms var(--ease-expo),
+      opacity var(--dur-base) var(--ease-out);
+  }
+  :global(html[data-theme='dark']) .theme .moon {
+    opacity: 0;
+    transform: rotate(-60deg) scale(0.5);
+  }
+  :global(html[data-theme='light']) .theme .sun-core,
+  :global(html[data-theme='light']) .theme .sun-rays {
+    opacity: 0;
+    transform: rotate(60deg) scale(0.5);
+  }
+  :global(html:not([data-theme])) .theme .moon {
+    opacity: 0;
+  }
+
+  .burger {
+    position: relative;
+  }
+  .burger span {
+    position: absolute;
+    left: 50%;
+    width: 1.25rem;
+    height: 1.5px;
+    margin-left: -0.625rem;
+    background: currentColor;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .burger span:first-child {
+    transform: translateY(-4px);
+  }
+  .burger span:last-child {
+    transform: translateY(4px);
+  }
+  .burger[aria-expanded='true'] span:first-child {
+    transform: rotate(45deg);
+  }
+  .burger[aria-expanded='true'] span:last-child {
+    transform: rotate(-45deg);
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    display: flex;
+    align-items: center;
+    padding-top: var(--header-h);
+    background: var(--color-bg);
+    visibility: hidden;
+    clip-path: inset(0 0 100% 0);
+    transition:
+      clip-path 650ms var(--ease-in-out),
+      visibility 0s 650ms;
+  }
+  :global(html.menu-open) .menu {
+    visibility: visible;
+    clip-path: inset(0);
+    transition:
+      clip-path 650ms var(--ease-in-out),
+      visibility 0s;
+  }
+  :global(html:not(.js)) .burger {
+    display: none;
+  }
+  .menu ul {
+    border-top: 1px solid var(--color-line);
+  }
+  .menu li,
+  .menu-foot {
+    opacity: 0;
+    transform: translate3d(0, 1.5rem, 0);
+    transition:
+      opacity var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+  }
+  :global(html.menu-open) .menu li,
+  :global(html.menu-open) .menu-foot {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 600ms var(--ease-out) calc(220ms + var(--i) * 55ms),
+      transform 700ms var(--ease-expo) calc(220ms + var(--i) * 55ms);
+  }
+  .menu a {
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--color-line);
+    color: var(--color-strong);
+  }
+  .menu .idx {
+    color: var(--color-accent-text);
+    width: 2rem;
+  }
+  .menu .label {
+    font-size: clamp(2rem, 9vw, 3.25rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+  .menu-foot {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    color: var(--color-muted);
+  }
+  @media (max-height: 34rem) {
+    .menu .label {
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (min-width: 30rem) {
+    .brand-name {
+      display: inline;
+    }
+  }
+  @media (min-width: 64rem) {
+    .nav {
+      display: block;
+    }
+    .burger,
+    .menu {
+      display: none;
+    }
+    .actions {
+      gap: 0.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,16 @@
+---
+import { brandColor, getTech, type TechId } from '@/data/tech';
+
+interface Props {
+  id: TechId;
+}
+
+/* Os desenhos ficam uma vez só na página, em TechSprite.astro; aqui há apenas a referência. */
+const { id } = Astro.props;
+const { icon } = getTech(id);
+const brand = icon ? brandColor(icon.hex) : undefined;
+---
+
+<svg class="ti" viewBox="0 0 24 24" aria-hidden="true" style={brand ? `--brand:${brand}` : undefined}>
+  <use href={`#ti-${id}`}></use>
+</svg>

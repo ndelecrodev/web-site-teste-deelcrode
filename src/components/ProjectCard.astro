@@ -1,0 +1,285 @@
+---
+import { Image } from 'astro:assets';
+import PipelineDiagram from './PipelineDiagram.astro';
+import Tag from './Tag.astro';
+import adminShot from '@/assets/cases/quimia-admin-dashboard.png';
+import type { Project } from '@/data/projects';
+import { getTech } from '@/data/tech';
+import { getDictionary, localizePath, type Locale } from '@/i18n';
+
+interface Props {
+  project: Project;
+  index: number;
+  lang: Locale;
+}
+
+const { project, index, lang } = Astro.props;
+const dict = getDictionary(lang);
+const { labels, links } = dict.projects;
+const copy = dict.projects.items[project.id];
+const caseHref = project.caseSlug ? localizePath(`/cases/${project.caseSlug}/`, lang) : undefined;
+const shotAlt = dict.cases.items['quimia-admin'].shotAlt;
+const points = [
+  { label: labels.problem, text: copy.problem },
+  { label: labels.solution, text: copy.solution },
+  { label: labels.quality, text: copy.quality },
+];
+---
+
+<article
+  class:list={['card', { featured: project.featured }]}
+  data-card
+  data-cats={project.categories.join(' ')}
+  data-reveal
+  style={`--reveal-delay:${(index % 3) * 90}ms`}
+>
+  <div class="inner" data-tilt>
+    <header class="top mono">
+      <span class="num">{String(index + 1).padStart(2, '0')}</span>
+      <span>{copy.kind}</span>
+      <span class="who">{project.team ? labels.team : labels.solo}</span>
+    </header>
+
+    <h3>{copy.title}</h3>
+
+    {project.id === 'tts' && (
+      <div class="preview diagram">
+        <PipelineDiagram />
+      </div>
+    )}
+    {project.id === 'quimia-admin' && (
+      <div class="preview shot">
+        <Image
+          src={adminShot}
+          alt={shotAlt}
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 64rem) 42vw, 92vw"
+          loading="lazy"
+          decoding="async"
+          data-parallax="6"
+        />
+      </div>
+    )}
+
+    <dl class="points">
+      {points.map((point) => (
+        <div>
+          <dt class="mono">{point.label}</dt>
+          <dd>{point.text}</dd>
+        </div>
+      ))}
+    </dl>
+
+    <ul class="stack" aria-label={labels.stack}>
+      {project.tech.map((id) => (
+        <li>
+          <Tag tech={id} label={getTech(id).name} />
+        </li>
+      ))}
+    </ul>
+
+    <footer class="links mono">
+      {caseHref && (
+        <a class="link primary" href={caseHref} aria-label={`${links.case}: ${copy.title}`}>
+          {links.case}
+          <span class="arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+      )}
+      <a class="link" href={project.repo} rel="noopener" aria-label={`${links.repo}: ${copy.title}`}>
+        {links.repo}
+        <span class="arrow" aria-hidden="true">
+          ↗
+        </span>
+      </a>
+      {project.demo && (
+        <a class="link" href={project.demo} rel="noopener" aria-label={`${links.demo}: ${copy.title}`}>
+          {links.demo}
+          <span class="arrow" aria-hidden="true">
+            ↗
+          </span>
+        </a>
+      )}
+    </footer>
+  </div>
+</article>
+
+<style>
+  .card {
+    grid-column: span 12;
+    perspective: 1200px;
+  }
+  .card[hidden] {
+    display: none;
+  }
+  .inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: 100%;
+    padding: clamp(1.25rem, 2.2vw, 2rem);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    overflow: hidden;
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition:
+      border-color var(--dur-base) var(--ease-out),
+      transform 300ms var(--ease-out);
+  }
+  .inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      26rem circle at var(--mx, 50%) var(--my, 0%),
+      color-mix(in oklch, var(--color-accent) 16%, transparent),
+      transparent 65%
+    );
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-out);
+    pointer-events: none;
+  }
+  .inner > * {
+    position: relative;
+  }
+  .card:hover .inner,
+  .card:focus-within .inner {
+    border-color: var(--color-line-strong);
+  }
+  .card:hover .inner::before {
+    opacity: 1;
+  }
+
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    color: var(--color-muted);
+  }
+  .num {
+    color: var(--color-accent-text);
+  }
+  .who {
+    margin-left: auto;
+  }
+
+  h3 {
+    font-size: var(--step-2);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+  .featured h3 {
+    font-size: var(--step-3);
+  }
+
+  .preview {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    overflow: hidden;
+  }
+  .diagram {
+    display: grid;
+    place-items: center;
+    padding: clamp(0.5rem, 2vw, 1.5rem);
+    aspect-ratio: 1901 / 909;
+  }
+  .shot {
+    aspect-ratio: 1901 / 909;
+  }
+  .shot :global(img) {
+    width: 100%;
+    height: 112%;
+    object-fit: cover;
+    object-position: 50% 0;
+    transition: scale 900ms var(--ease-out);
+  }
+  .card:hover .shot :global(img) {
+    scale: 1.035;
+  }
+
+  .points {
+    display: grid;
+    gap: 0.9rem;
+  }
+  .points div {
+    display: grid;
+    gap: 0.15rem;
+  }
+  dt {
+    color: var(--color-muted);
+    font-size: 0.6875rem;
+  }
+  dd {
+    color: var(--color-fg);
+    line-height: 1.45;
+  }
+
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: auto;
+    padding-top: 0.25rem;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-line);
+  }
+  .links .primary {
+    color: var(--color-accent-text);
+  }
+  .links .primary:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    :global(html.motion) .stack li {
+      transform: translate3d(0, 0.4rem, 0);
+      transition: transform var(--dur-base) var(--ease-out);
+    }
+    :global(html.motion) .card:hover .stack li,
+    :global(html.motion) .card:focus-within .stack li {
+      transform: none;
+    }
+    .card:hover .stack :global(.ti),
+    .card:focus-within .stack :global(.ti) {
+      color: var(--brand, var(--color-strong));
+    }
+    .stack li:nth-child(2) {
+      transition-delay: 40ms;
+    }
+    .stack li:nth-child(3) {
+      transition-delay: 80ms;
+    }
+    .stack li:nth-child(4) {
+      transition-delay: 120ms;
+    }
+    .stack li:nth-child(5) {
+      transition-delay: 160ms;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .card {
+      grid-column: span 6;
+    }
+    .card.featured {
+      grid-column: span 12;
+    }
+  }
+  @media (min-width: 64rem) {
+    .card {
+      grid-column: span 4;
+    }
+    .card.featured {
+      grid-column: span 6;
+    }
+  }
+</style>

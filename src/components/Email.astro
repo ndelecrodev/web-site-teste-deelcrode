@@ -1,0 +1,20 @@
+---
+import { site } from '@/data/site';
+
+/*
+ * O endereço é quebrado em nós separados para não casar com regex de scraper; o cliente remonta.
+ * O HTML vai numa string única para que nenhum formatador insira espaços entre as partes.
+ */
+const { user, domain, tld } = site.email;
+const parts = `${user}<span>&#64;</span>${domain}<span>&#46;</span>${tld}`;
+---
+
+<span
+  class="email"
+  data-email
+  data-user={user}
+  data-domain={domain}
+  data-tld={tld}
+  translate="no"
+  set:html={parts}
+/>

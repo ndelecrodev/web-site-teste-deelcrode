@@ -1,0 +1,399 @@
+---
+import Button from '@/components/Button.astro';
+import { site } from '@/data/site';
+import { getDictionary, sectionId, type Locale } from '@/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const dict = getDictionary(lang);
+const { hero } = dict;
+const nameLines = site.name.split(' ');
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <svg class="blueprint" viewBox="0 0 600 600" fill="none" aria-hidden="true" data-parallax="10">
+    <circle cx="300" cy="300" r="299"></circle>
+    <circle cx="300" cy="300" r="200"></circle>
+    <circle cx="300" cy="300" r="100"></circle>
+    <path d="M300 0v600M0 300h600"></path>
+    <path class="ticks" d="M300 0v600M0 300h600"></path>
+  </svg>
+
+  <div class="wrap">
+    <p class="meta mono intro-fade" style="--i:0">
+      <span class="status">
+        <span class="dot" aria-hidden="true"></span>
+        {hero.status}
+      </span>
+      <span class="role">{hero.role}</span>
+      <span class="coords">
+        {site.coordinates.lat} · {site.coordinates.lon}
+      </span>
+    </p>
+
+    <div class="layout">
+      <h1 id="hero-title" class="name">
+        {nameLines.map((word, index) => (
+          <>
+            <span class:list={['line', { light: index === 1 }]}>
+              <span style={`--i:${index}`}>{word}</span>
+            </span>
+            {index < nameLines.length - 1 && ' '}
+          </>
+        ))}
+      </h1>
+
+      <div class="pitch">
+        <p class="headline intro-fade" style="--i:3">
+          {hero.headline}
+        </p>
+        <p class="lead intro-fade" style="--i:4">
+          {hero.lead}
+        </p>
+        <div class="cta intro-fade" style="--i:5">
+          <Button variant="primary" href={`#${sectionId(lang, 'projects')}`} icon="arrow" magnetic>
+            {hero.ctaProjects}
+          </Button>
+          <Button href={site.cv[lang]} download icon="down">
+            {hero.ctaCv}
+            <span class="sr-only">{hero.cvNote}</span>
+          </Button>
+          <a class="link mono" href={site.github} rel="noopener">
+            GitHub
+            <span class="arrow" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <div class="terminal intro-fade" style="--i:4" role="img" aria-label={hero.terminal.aria} data-terminal>
+        <div class="t-head mono">
+          <span class="t-title">{hero.terminal.title}</span>
+          <span class="t-sched">{hero.terminal.schedule}</span>
+        </div>
+        <ol class="t-rows">
+          {hero.terminal.steps.map((step, index) => (
+            <li data-step data-state="done">
+              <span class="t-num">{String(index + 1).padStart(2, '0')}</span>
+              <span class="t-label">{step}</span>
+              <span class="t-status">
+                <span class="t-ok">{hero.terminal.ok}</span>
+                <span class="t-run" />
+              </span>
+            </li>
+          ))}
+        </ol>
+        <div class="t-foot">
+          <div class="t-bar">
+            <span data-terminal-bar></span>
+          </div>
+          <p class="mono t-done">{hero.terminal.done}</p>
+          <p class="t-note">{hero.terminal.note}</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="scroll mono intro-fade" style="--i:7" aria-hidden="true">
+      <span class="scroll-line"></span>
+      {hero.scroll}
+    </p>
+  </div>
+</section>
+
+<style>
+  .hero {
+    --intro-delay: 80ms;
+    position: relative;
+    display: flex;
+    min-height: 100svh;
+    padding-top: calc(var(--header-h) + clamp(1.5rem, 5vh, 4rem));
+    padding-bottom: clamp(2rem, 5vh, 4rem);
+    overflow: clip;
+  }
+  :global(html.preloading) .hero {
+    --intro-delay: 780ms;
+  }
+  .hero > .wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 4vh, 3rem);
+  }
+
+  .blueprint {
+    position: absolute;
+    top: -12%;
+    right: -18%;
+    width: min(90vw, 54rem);
+    height: auto;
+    stroke: var(--color-line);
+    stroke-width: 1;
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  .blueprint .ticks {
+    stroke: var(--color-line-strong);
+    stroke-width: 9;
+    stroke-dasharray: 1 19;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 2rem;
+    color: var(--color-muted);
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--color-fg);
+  }
+  .dot {
+    position: relative;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-ok);
+  }
+  .dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--color-ok);
+    animation: pulse-ring 2.4s var(--ease-out) infinite;
+  }
+  .coords {
+    display: none;
+  }
+
+  .layout {
+    display: grid;
+    gap: clamp(2rem, 5vh, 3.5rem);
+    flex: 1;
+    align-content: center;
+  }
+
+  .name {
+    font-size: clamp(3.4rem, 0.5rem + 15.2vw, 9rem);
+    font-weight: 750;
+    letter-spacing: -0.05em;
+    line-height: 0.86;
+    text-wrap: nowrap;
+  }
+  .line {
+    display: block;
+    overflow: clip;
+    overflow-clip-margin: 0.04em;
+    padding-block: 0.06em 0.1em;
+    margin-block: -0.06em -0.1em;
+  }
+  .line > span {
+    display: inline-block;
+  }
+  .line.light {
+    font-weight: 300;
+    letter-spacing: -0.05em;
+    color: var(--color-soft);
+  }
+  :global(html.motion) .line > span {
+    animation: line-up 1100ms var(--ease-expo) calc(var(--intro-delay) + var(--i) * 90ms) both;
+  }
+  :global(html.motion) .intro-fade {
+    animation: fade-up 900ms var(--ease-out) calc(var(--intro-delay) + 250ms + var(--i) * 70ms) both;
+  }
+
+  .pitch {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 38rem;
+  }
+  .headline {
+    color: var(--color-strong);
+    font-size: var(--step-2);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+  .lead {
+    max-width: 32rem;
+    color: var(--color-soft);
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-top: 0.5rem;
+  }
+  .cta .link {
+    margin-left: 0.5rem;
+  }
+
+  .terminal {
+    position: relative;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-md);
+    background: color-mix(in oklch, var(--color-surface) 88%, transparent);
+    box-shadow: var(--shadow-raise);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+  .t-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--color-line);
+    color: var(--color-muted);
+    font-size: 0.6875rem;
+  }
+  .t-title {
+    color: var(--color-strong);
+  }
+  .t-rows {
+    padding: 0.6rem 1rem;
+  }
+  .t-rows li {
+    display: grid;
+    grid-template-columns: 1.6rem 1fr 2rem;
+    gap: 0.6rem;
+    align-items: baseline;
+    padding-block: 0.28rem;
+    color: var(--color-fg);
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .t-num {
+    color: var(--color-muted);
+  }
+  .t-status {
+    position: relative;
+    display: grid;
+    justify-items: end;
+  }
+  .t-ok,
+  .t-run {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+  }
+  .t-ok {
+    color: var(--color-ok);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .t-run {
+    align-self: center;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  .t-rows li[data-state='wait'] {
+    color: var(--color-muted);
+  }
+  .t-rows li[data-state='wait'] .t-ok,
+  .t-rows li[data-state='run'] .t-ok {
+    visibility: hidden;
+    transform: translateY(0.4rem);
+  }
+  .t-rows li[data-state='run'] {
+    color: var(--color-strong);
+  }
+  .t-rows li[data-state='run'] .t-run {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .t-foot {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.9rem 1rem 1rem;
+    border-top: 1px solid var(--color-line);
+  }
+  .t-bar {
+    height: 2px;
+    background: var(--color-line);
+    overflow: hidden;
+  }
+  .t-bar span {
+    display: block;
+    height: 100%;
+    background: var(--color-accent);
+    transform: scaleX(var(--bar, 1));
+    transform-origin: 0 50%;
+    transition: transform 600ms var(--ease-out);
+  }
+  .t-done {
+    color: var(--color-strong);
+    font-size: 0.6875rem;
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .terminal.is-running .t-done {
+    color: var(--color-muted);
+  }
+  .t-note {
+    color: var(--color-muted);
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .scroll {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-muted);
+  }
+  .scroll-line {
+    width: 3rem;
+    height: 1px;
+    background: var(--color-line-strong);
+  }
+
+  @media (min-width: 40rem) {
+    .coords {
+      display: inline;
+      margin-left: auto;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .layout {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-rows: auto auto;
+      column-gap: clamp(1rem, 2vw, 2rem);
+      row-gap: clamp(2rem, 5vh, 3.5rem);
+    }
+    .name {
+      grid-column: 1 / span 8;
+      font-size: clamp(4.5rem, min(10.3vw, 16.5vh), 11.5rem);
+    }
+    .pitch {
+      grid-column: 1 / span 7;
+    }
+    .terminal {
+      grid-column: 8 / -1;
+      grid-row: 1 / span 2;
+      align-self: end;
+    }
+    .scroll {
+      display: flex;
+    }
+  }
+  @media (min-width: 80rem) {
+    .terminal {
+      grid-column: 9 / -1;
+    }
+  }
+</style>

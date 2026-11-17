@@ -1,0 +1,20 @@
+---
+import { splitWords } from '@/lib/inline';
+
+interface Props {
+  text: string;
+}
+
+const words = splitWords(Astro.props.text);
+---
+
+{words.map((word, index) => (
+  <>
+    <span class="w">
+      <span class="wi" style={`--wi:${index}`}>
+        {word}
+      </span>
+    </span>
+    {index < words.length - 1 && ' '}
+  </>
+))}

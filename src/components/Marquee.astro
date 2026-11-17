@@ -1,0 +1,62 @@
+---
+interface Props {
+  /** Segundos para uma volta completa. */
+  duration?: number;
+  reverse?: boolean;
+  class?: string;
+}
+
+const { duration = 40, reverse = false, class: className } = Astro.props;
+const content = await Astro.slots.render('default');
+---
+
+<div class:list={['marquee', className]} data-marquee style={`--marquee-duration:${duration}s`}>
+  <div class:list={['track', { reverse }]}>
+    <div class="group" set:html={content} />
+    <div class="group" aria-hidden="true" set:html={content} />
+  </div>
+</div>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .track {
+    display: flex;
+    width: max-content;
+    animation: marquee var(--marquee-duration) linear infinite;
+    animation-play-state: paused;
+  }
+  .track.reverse {
+    animation-direction: reverse;
+  }
+  .marquee:global(.is-visible) .track {
+    animation-play-state: running;
+  }
+  .marquee:hover .track,
+  .marquee:focus-within .track {
+    animation-play-state: paused;
+  }
+  .group {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      mask-image: none;
+    }
+    .track {
+      width: auto;
+      animation: none;
+    }
+    .group {
+      flex-wrap: wrap;
+      flex-shrink: 1;
+    }
+    .group[aria-hidden='true'] {
+      display: none;
+    }
+  }
+</style>

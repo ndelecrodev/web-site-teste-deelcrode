@@ -1,0 +1,21 @@
+---
+import { tech, type Tech } from '@/data/tech';
+
+const symbols = Object.entries<Tech>(tech).flatMap(([id, item]) =>
+  item.icon ? [{ id, path: item.icon.path }] : [],
+);
+---
+
+<svg class="sprite" aria-hidden="true" width="0" height="0">
+  {symbols.map((symbol) => (
+    <symbol id={`ti-${symbol.id}`} viewBox="0 0 24 24">
+      <path d={symbol.path} />
+    </symbol>
+  ))}
+</svg>
+
+<style>
+  .sprite {
+    position: absolute;
+  }
+</style>

@@ -1,0 +1,182 @@
+---
+import Button from '@/components/Button.astro';
+import Email from '@/components/Email.astro';
+import Marquee from '@/components/Marquee.astro';
+import { LINKEDIN_URL, site } from '@/data/site';
+import { getDictionary, sectionId, type Locale } from '@/i18n';
+
+interface Props {
+  lang: Locale;
+  /** Na home o bloco é a seção 06; nas páginas internas vira um fecho sem âncora de navegação. */
+  standalone?: boolean;
+}
+
+const { lang, standalone = false } = Astro.props;
+const { contact } = getDictionary(lang);
+const id = sectionId(lang, 'contact');
+---
+
+<section
+  id={standalone ? undefined : id}
+  class="contact"
+  aria-labelledby="contact-title"
+  data-section={standalone ? undefined : 'contact'}
+  data-cv
+>
+  <h2 id="contact-title" class="sr-only">
+    {contact.title}: {contact.big}
+  </h2>
+
+  <div class="big" aria-hidden="true" data-skew>
+    <Marquee duration={26}>
+      {[0, 1, 2].map(() => (
+        <span class="phrase">
+          {contact.big}
+          <span class="star">✳</span>
+        </span>
+      ))}
+    </Marquee>
+  </div>
+
+  <div class="wrap grid-12 body">
+    <p class="mono index" data-reveal>
+      <span class="num">06</span>
+      {contact.title}
+    </p>
+
+    <div class="text" data-reveal>
+      <p class="lead">{contact.text}</p>
+      <p class="address">
+        <span class="mono label">{contact.emailLabel}</span>
+        <Email />
+      </p>
+    </div>
+
+    <div class="actions" data-reveal style="--reveal-delay:120ms">
+      <Button
+        variant="primary"
+        href={`#${id}`}
+        icon="arrow"
+        magnetic
+        class="cta"
+        aria-label={contact.ctaAria}
+        data-mailto
+      >
+        {contact.cta}
+      </Button>
+      <Button data-copy-email data-copied={contact.copied} data-failed={contact.copyFail}>
+        <span class="swap">
+          <span data-state="idle">{contact.copy}</span>
+          <span data-state="done" aria-hidden="true">
+            {contact.copied} ✓
+          </span>
+        </span>
+      </Button>
+      <Button href={site.cv[lang]} download icon="down">
+        {contact.cv}
+      </Button>
+      <Button href={site.github} rel="noopener" icon="arrow">
+        GitHub
+      </Button>
+      {LINKEDIN_URL && (
+        <Button href={LINKEDIN_URL} rel="noopener" icon="arrow">
+          LinkedIn
+        </Button>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact {
+    padding-block: var(--section-y) calc(var(--section-y) * 0.7);
+    border-top: 1px solid var(--color-line);
+    overflow: clip;
+  }
+  .big {
+    margin-bottom: clamp(2.5rem, 6vw, 5rem);
+    color: var(--color-strong);
+    font-size: clamp(4rem, 1rem + 15vw, 15rem);
+    font-weight: 750;
+    letter-spacing: -0.06em;
+    line-height: 0.95;
+    white-space: nowrap;
+  }
+  .big :global(.marquee) {
+    mask-image: none;
+    padding-block: 0.05em 0.12em;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .big :global(.group) {
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+  }
+  .phrase {
+    display: inline-flex;
+    align-items: center;
+    padding-right: 0.3em;
+  }
+  .star {
+    padding-left: 0.3em;
+    color: var(--color-accent);
+    font-size: 0.5em;
+    font-weight: 400;
+  }
+  .body {
+    row-gap: 2rem;
+  }
+  .index,
+  .text,
+  .actions {
+    grid-column: 1 / -1;
+  }
+  .index {
+    display: flex;
+    gap: 0.75rem;
+    color: var(--color-muted);
+  }
+  .num {
+    color: var(--color-accent-text);
+  }
+  .lead {
+    max-width: 30rem;
+    color: var(--color-soft);
+    font-size: var(--step-1);
+    line-height: 1.4;
+  }
+  .address {
+    display: grid;
+    gap: 0.4rem;
+    margin-top: 2rem;
+  }
+  .label {
+    color: var(--color-muted);
+  }
+  .address :global(.email) {
+    color: var(--color-strong);
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 0.6rem + 1.7vw, 1.6rem);
+    letter-spacing: -0.02em;
+    overflow-wrap: anywhere;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: start;
+    gap: 0.75rem;
+  }
+  .actions :global(.cta) {
+    flex-basis: 100%;
+    min-height: 4.5rem;
+    font-size: 1rem;
+  }
+  @media (min-width: 64rem) {
+    .text {
+      grid-column: 1 / span 6;
+    }
+    .actions {
+      grid-column: 8 / -1;
+    }
+  }
+</style>

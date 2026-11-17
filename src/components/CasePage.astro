@@ -1,0 +1,329 @@
+---
+import { Image } from 'astro:assets';
+import Base from '@/layouts/Base.astro';
+import Button from './Button.astro';
+import Contact from './sections/Contact.astro';
+import SplitText from './SplitText.astro';
+import type { CaseStudy } from '@/data/cases';
+import { getDictionary, localizePath, sectionId, type Locale } from '@/i18n';
+import { renderInline } from '@/lib/inline';
+
+interface Props {
+  lang: Locale;
+  study: CaseStudy;
+}
+
+const { lang, study } = Astro.props;
+const dict = getDictionary(lang);
+const labels = dict.cases;
+const copy = labels.items[study.slug];
+const back = `${localizePath('/', lang)}#${sectionId(lang, 'projects')}`;
+const blocks = [
+  { title: labels.context, text: copy.context },
+  { title: labels.problem, text: copy.problem },
+];
+const closing = [
+  { title: labels.result, text: copy.result },
+  { title: labels.limits, text: copy.limits },
+];
+---
+
+<Base
+  lang={lang}
+  path={`/cases/${study.slug}/`}
+  title={`${copy.title} | ${dict.meta.title}`}
+  description={copy.summary}
+  ogType="article"
+>
+  <article class="case">
+    <header class="wrap head">
+      <a class="link mono back" href={back}>
+        <span class="arrow" aria-hidden="true">
+          ←
+        </span>
+        {labels.back}
+      </a>
+      <p class="mono eyebrow intro-fade" style="--i:0">
+        {labels.eyebrow}
+      </p>
+      <h1 class="split is-in">
+        <SplitText text={copy.title} />
+      </h1>
+      <p class="summary intro-fade" style="--i:2">
+        {copy.summary}
+      </p>
+      <ul class="stack intro-fade" style="--i:3" aria-label={labels.stack}>
+        {study.stack.map((item) => (
+          <li class="tag">{item}</li>
+        ))}
+      </ul>
+    </header>
+
+    <div class="wrap content">
+      {blocks.map((block) => (
+        <section class="block" data-reveal>
+          <h2 class="mono">{block.title}</h2>
+          <p class="large" set:html={renderInline(block.text)} />
+        </section>
+      ))}
+
+      <section class="block">
+        <h2 class="mono" data-reveal>
+          {labels.decisions}
+        </h2>
+        <ol class="decisions">
+          {copy.decisions.map((decision, index) => (
+            <li data-reveal style={`--reveal-delay:${(index % 4) * 60}ms`}>
+              <span class="mono num" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <p>
+                <strong set:html={renderInline(decision.h)} />{' '}
+                <Fragment set:html={renderInline(decision.t)} />
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {copy.extras.map((extra) => (
+        <section class="block" data-reveal>
+          <h2 class="mono">{extra.h}</h2>
+          {extra.text && <p set:html={renderInline(extra.text)} />}
+          {extra.items.length > 0 && extra.ordered && (
+            <ol class="steps">
+              {extra.items.map((item) => (
+                <li set:html={renderInline(item)} />
+              ))}
+            </ol>
+          )}
+          {extra.items.length > 0 && !extra.ordered && (
+            <ul class="bullets">
+              {extra.items.map((item) => (
+                <li set:html={renderInline(item)} />
+              ))}
+            </ul>
+          )}
+        </section>
+      ))}
+
+      {study.diagram && (
+        <section class="block" data-reveal>
+          <h2 class="mono">{labels.diagram}</h2>
+          <figure class="figure">
+            <Image src={study.diagram[lang]} alt={copy.diagramAlt} loading="lazy" decoding="async" />
+          </figure>
+        </section>
+      )}
+
+      {study.shot && (
+        <figure class="figure shot" data-reveal>
+          <Image
+            src={study.shot}
+            alt={copy.shotAlt}
+            widths={[640, 960, 1440, 1900]}
+            sizes="(min-width: 90rem) 82rem, 92vw"
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption class="mono">{copy.shotCaption}</figcaption>
+        </figure>
+      )}
+
+      {closing.map((block) => (
+        <section class="block" data-reveal>
+          <h2 class="mono">{block.title}</h2>
+          <p class="large" set:html={renderInline(block.text)} />
+        </section>
+      ))}
+
+      <section class="block" data-reveal>
+        <h2 class="mono">{labels.links}</h2>
+        <div class="links">
+          {study.links.map((link) => (
+            <Button href={link.href} rel="noopener" icon="arrow">
+              {labels.linkKinds[link.kind]}
+            </Button>
+          ))}
+        </div>
+      </section>
+    </div>
+  </article>
+
+  <Contact lang={lang} standalone />
+</Base>
+
+<style>
+  .case {
+    padding-top: calc(var(--header-h) + clamp(1.5rem, 4vw, 3.5rem));
+    padding-bottom: var(--section-y);
+  }
+  .head {
+    display: grid;
+    gap: 1.25rem;
+    padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
+    border-bottom: 1px solid var(--color-line-strong);
+  }
+  .back {
+    justify-self: start;
+    color: var(--color-muted);
+  }
+  .back:hover .arrow {
+    transform: translateX(-4px);
+  }
+  .eyebrow {
+    margin-top: 1rem;
+    color: var(--color-accent-text);
+  }
+  h1 {
+    max-width: 22ch;
+    font-size: clamp(2.2rem, 1.2rem + 4.4vw, 5rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 0.98;
+  }
+  :global(html.motion) h1 :global(.wi) {
+    animation: line-up 1000ms var(--ease-expo) calc(80ms + var(--wi) * 45ms) both;
+  }
+  :global(html.motion) .intro-fade {
+    animation: fade-up 900ms var(--ease-out) calc(300ms + var(--i) * 80ms) both;
+  }
+  .summary {
+    max-width: 44rem;
+    color: var(--color-soft);
+    font-size: var(--step-1);
+    line-height: 1.4;
+  }
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .content {
+    display: grid;
+  }
+  .block {
+    display: grid;
+    gap: 1rem;
+    padding-block: clamp(2rem, 4vw, 3.5rem);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .block h2 {
+    color: var(--color-muted);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+  }
+  .block > p,
+  .block > ul,
+  .block > ol,
+  .block > .links,
+  .block > .figure {
+    max-width: 50rem;
+    color: var(--color-fg);
+  }
+  .block > .figure {
+    max-width: none;
+  }
+  .large {
+    color: var(--color-strong);
+    font-size: var(--step-1);
+    line-height: 1.45;
+  }
+  strong {
+    color: var(--color-strong);
+    font-weight: 650;
+  }
+  .decisions {
+    display: grid;
+    border-top: 1px solid var(--color-line);
+  }
+  .decisions li {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 1rem;
+    padding-block: 1.1rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .decisions li:last-child {
+    border-bottom: 0;
+  }
+  .decisions .num {
+    padding-top: 0.3rem;
+    color: var(--color-accent-text);
+  }
+  .steps {
+    display: grid;
+    counter-reset: step;
+  }
+  .steps li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+    padding-block: 0.7rem;
+    border-bottom: 1px dashed var(--color-line);
+  }
+  .steps li::before {
+    content: counter(step, decimal-leading-zero);
+    color: var(--color-accent-text);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+  }
+  .bullets {
+    display: grid;
+    gap: 0.7rem;
+  }
+  .bullets li {
+    position: relative;
+    padding-left: 1.5rem;
+  }
+  .bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.6rem;
+    height: 1px;
+    background: var(--color-accent);
+  }
+  .figure {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+  .figure :global(img) {
+    width: 100%;
+    height: auto;
+  }
+  .shot {
+    margin-block: clamp(2rem, 4vw, 3.5rem);
+  }
+  figcaption {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--color-line);
+    color: var(--color-muted);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 64rem) {
+    .block {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: clamp(1rem, 2vw, 2rem);
+    }
+    .block h2 {
+      grid-column: 1 / span 3;
+    }
+    .block > :not(h2) {
+      grid-column: 4 / -1;
+    }
+  }
+</style>
