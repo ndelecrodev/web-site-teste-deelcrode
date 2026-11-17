@@ -2,8 +2,9 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import satori from 'satori';
 import sharp from 'sharp';
-import { SITE_URL, site } from '@/data/site';
+import { site } from '@/data/site';
 import { getDictionary, type Locale } from '@/i18n';
+import { siteUrl } from '@/lib/url';
 
 /* Equivalentes em hex dos tokens OKLCH (satori e ícones PNG não entendem oklch). */
 const COLOR = {
@@ -65,7 +66,7 @@ export const renderOgImage = async (lang: Locale): Promise<Buffer> => {
     },
     [
       el({ justifyContent: 'space-between', alignItems: 'center' }, [
-        el({ ...monoText, color: COLOR.fg }, new URL(SITE_URL).host),
+        el({ ...monoText, color: COLOR.fg }, new URL(siteUrl).host),
         el(monoText, `${site.coordinates.lat} · ${site.coordinates.lon}`),
       ]),
       el({ flexDirection: 'column', fontSize: 132, lineHeight: 0.9, letterSpacing: -6 }, [

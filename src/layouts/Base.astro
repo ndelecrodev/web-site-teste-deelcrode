@@ -6,8 +6,9 @@ import monoFont from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-l
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import BrandMark from '@/components/BrandMark.astro';
-import { SITE_URL, LINKEDIN_URL, site } from '@/data/site';
+import { LINKEDIN_URL, site } from '@/data/site';
 import { getDictionary, htmlLang, localizePath, ogLocale, otherLocale, type Locale } from '@/i18n';
+import { absoluteUrl, withBase } from '@/lib/url';
 
 interface Props {
   lang: Locale;
@@ -26,9 +27,11 @@ const dict = getDictionary(lang);
 const other = otherLocale(lang);
 const pageTitle = title ?? dict.meta.title;
 const pageDescription = description ?? dict.meta.description;
-const canonical = new URL(localizePath(path, lang), SITE_URL).href;
-const alternate = localizePath(path, other);
-const ogImage = new URL(`/og-${lang}.png`, SITE_URL).href;
+const canonical = absoluteUrl(localizePath(path, lang));
+const alternate = withBase(localizePath(path, other));
+const ogImage = absoluteUrl(`/og-${lang}.png`);
+const homeUrl = absoluteUrl('/');
+const noindex = !indexable || import.meta.env.PUBLIC_NOINDEX === 'true';
 
 const LATIN =
   'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD';
@@ -41,11 +44,11 @@ const jsonLd = {
   '@graph': [
     {
       '@type': 'Person',
-      '@id': `${SITE_URL}/#person`,
+      '@id': `${homeUrl}#person`,
       name: site.name,
       alternateName: site.shortName,
       jobTitle: dict.meta.titleSuffix,
-      url: `${SITE_URL}/`,
+      url: homeUrl,
       image: ogImage,
       sameAs: [site.github, LINKEDIN_URL].filter(Boolean),
       knowsAbout: ['Python', 'FastAPI', 'Django', 'Java', 'Spring Boot', 'PostgreSQL', 'REST APIs'],
@@ -58,11 +61,11 @@ const jsonLd = {
     },
     {
       '@type': 'WebSite',
-      '@id': `${SITE_URL}/#website`,
-      url: `${SITE_URL}/`,
+      '@id': `${homeUrl}#website`,
+      url: homeUrl,
       name: site.shortName,
       inLanguage: ['pt-BR', 'en'],
-      publisher: { '@id': `${SITE_URL}/#person` },
+      publisher: { '@id': `${homeUrl}#person` },
     },
   ],
 };
@@ -76,13 +79,13 @@ const jsonLd = {
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <meta name="author" content={site.name} />
-    {!indexable && <meta name="robots" content="noindex" />}
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     {indexable && (
       <>
-        <link rel="alternate" hreflang="pt-BR" href={new URL(localizePath(path, 'pt'), SITE_URL).href} />
-        <link rel="alternate" hreflang="en" href={new URL(localizePath(path, 'en'), SITE_URL).href} />
-        <link rel="alternate" hreflang="x-default" href={new URL(localizePath(path, 'pt'), SITE_URL).href} />
+        <link rel="alternate" hreflang="pt-BR" href={absoluteUrl(localizePath(path, 'pt'))} />
+        <link rel="alternate" hreflang="en" href={absoluteUrl(localizePath(path, 'en'))} />
+        <link rel="alternate" hreflang="x-default" href={absoluteUrl(localizePath(path, 'pt'))} />
       </>
     )}
     <meta name="theme-color" content="#0d0e11" media="(prefers-color-scheme: dark)" />
@@ -105,10 +108,10 @@ const jsonLd = {
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={dict.meta.ogAlt} />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <link rel="icon" href={withBase('/favicon-32.png')} type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
+    <link rel="manifest" href={withBase('/site.webmanifest')} />
 
     <link rel="preload" href={displayFont} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={monoFont} as="font" type="font/woff2" crossorigin />
@@ -196,7 +199,7 @@ const jsonLd = {
 
     <Footer lang={lang} onHome={onHome} />
 
-    <div class="grain" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true" style={`background-image:url(${withBase('/grain.svg')})`}></div>
     <div class="cursor" aria-hidden="true"></div>
     <div class="toast" role="status" aria-live="polite" data-toast></div>
 

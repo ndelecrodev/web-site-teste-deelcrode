@@ -2,6 +2,7 @@
 import Button from '@/components/Button.astro';
 import { site } from '@/data/site';
 import { getDictionary, sectionId, type Locale } from '@/i18n';
+import { withBase } from '@/lib/url';
 
 interface Props {
   lang: Locale;
@@ -57,7 +58,7 @@ const nameLines = site.name.split(' ');
           <Button variant="primary" href={`#${sectionId(lang, 'projects')}`} icon="arrow" magnetic>
             {hero.ctaProjects}
           </Button>
-          <Button href={site.cv[lang]} download icon="down">
+          <Button href={withBase(site.cv[lang])} download icon="down">
             {hero.ctaCv}
             <span class="sr-only">{hero.cvNote}</span>
           </Button>

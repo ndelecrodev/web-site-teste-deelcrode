@@ -27,3 +27,4 @@ Uma linha por decisão reversível tomada durante a construção.
 - **CV por idioma:** `/assets/cv.pdf` (português) e `/assets/cv-en.pdf` (inglês), copiados do repositório de referência.
 - **Coordenadas no hero e no rodapé:** são as da cidade de São Paulo, usadas como detalhe gráfico.
 - **Sem analytics:** nenhum script de terceiros; a nota de como ligar uma opção sem cookies está em `src/data/site.ts`.
+- **Base configurável:** `src/lib/url.ts` prefixa links e URLs absolutas com `BASE_PATH`/`SITE_URL`, para o mesmo código publicar na raiz do domínio (Cloudflare Pages) ou num subcaminho (GitHub Pages).

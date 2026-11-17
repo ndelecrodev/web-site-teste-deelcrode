@@ -6,6 +6,7 @@ import adminShot from '@/assets/cases/quimia-admin-dashboard.png';
 import type { Project } from '@/data/projects';
 import { getTech } from '@/data/tech';
 import { getDictionary, localizePath, type Locale } from '@/i18n';
+import { withBase } from '@/lib/url';
 
 interface Props {
   project: Project;
@@ -17,7 +18,7 @@ const { project, index, lang } = Astro.props;
 const dict = getDictionary(lang);
 const { labels, links } = dict.projects;
 const copy = dict.projects.items[project.id];
-const caseHref = project.caseSlug ? localizePath(`/cases/${project.caseSlug}/`, lang) : undefined;
+const caseHref = project.caseSlug ? withBase(localizePath(`/cases/${project.caseSlug}/`, lang)) : undefined;
 const shotAlt = dict.cases.items['quimia-admin'].shotAlt;
 const points = [
   { label: labels.problem, text: copy.problem },

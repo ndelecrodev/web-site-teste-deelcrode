@@ -3,7 +3,8 @@ import tailwindcss from '@tailwindcss/vite';
 import cspHeaders from './integrations/csp-headers.mjs';
 
 export default defineConfig({
-  site: 'https://nicolasdelecrode.dev',
+  site: process.env.SITE_URL ?? 'https://nicolasdelecrode.dev',
+  base: process.env.BASE_PATH ?? '/',
   trailingSlash: 'always',
   build: { format: 'directory', inlineStylesheets: 'always' },
   integrations: [cspHeaders()],

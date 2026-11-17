@@ -2,6 +2,7 @@
 import BrandMark from './BrandMark.astro';
 import { site } from '@/data/site';
 import { getDictionary, localizePath, sectionId, sectionKeys, type Locale } from '@/i18n';
+import { withBase } from '@/lib/url';
 
 interface Props {
   lang: Locale;
@@ -11,7 +12,7 @@ interface Props {
 
 const { lang, path, onHome } = Astro.props;
 const dict = getDictionary(lang);
-const home = localizePath('/', lang);
+const home = withBase(localizePath('/', lang));
 const items = sectionKeys.map((key, index) => ({
   key,
   index: String(index + 1).padStart(2, '0'),
@@ -50,7 +51,7 @@ const langs = [
           <>
             {index > 0 && <span aria-hidden="true">|</span>}
             <a
-              href={localizePath(path, item.code)}
+              href={withBase(localizePath(path, item.code))}
               hreflang={item.hreflang}
               lang={item.code}
               data-lang={item.code}

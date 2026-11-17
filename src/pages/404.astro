@@ -2,6 +2,7 @@
 import Base from '@/layouts/Base.astro';
 import Button from '@/components/Button.astro';
 import { getDictionary } from '@/i18n';
+import { withBase } from '@/lib/url';
 
 const pt = getDictionary('pt').notFound;
 const en = getDictionary('en').notFound;
@@ -32,14 +33,14 @@ const en = getDictionary('en').notFound;
         <div class="intro-fade" style="--i:3">
           <p class="line">{pt.line}</p>
           <p class="text">{pt.text}</p>
-          <Button variant="primary" href="/" icon="arrow" magnetic>
+          <Button variant="primary" href={withBase('/')} icon="arrow" magnetic>
             {pt.cta}
           </Button>
         </div>
         <div class="intro-fade" style="--i:4" lang="en">
           <p class="line">{en.line}</p>
           <p class="text">{en.text}</p>
-          <Button href="/en/" icon="arrow">
+          <Button href={withBase('/en/')} icon="arrow">
             {en.cta}
           </Button>
         </div>

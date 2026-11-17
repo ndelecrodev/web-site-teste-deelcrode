@@ -352,7 +352,7 @@ html.theme-switching::view-transition-new(root) {
   inset: 0;
   z-index: 60;
   pointer-events: none;
-  background: url('/grain.svg') 0 0 / 220px 220px;
+  background-size: 220px 220px;
   opacity: 0.06;
   transform: translateZ(0);
 }

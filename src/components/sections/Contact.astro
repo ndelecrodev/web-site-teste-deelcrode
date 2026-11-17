@@ -4,6 +4,7 @@ import Email from '@/components/Email.astro';
 import Marquee from '@/components/Marquee.astro';
 import { LINKEDIN_URL, site } from '@/data/site';
 import { getDictionary, sectionId, type Locale } from '@/i18n';
+import { withBase } from '@/lib/url';
 
 interface Props {
   lang: Locale;
@@ -72,7 +73,7 @@ const id = sectionId(lang, 'contact');
           </span>
         </span>
       </Button>
-      <Button href={site.cv[lang]} download icon="down">
+      <Button href={withBase(site.cv[lang])} download icon="down">
         {contact.cv}
       </Button>
       <Button href={site.github} rel="noopener" icon="arrow">

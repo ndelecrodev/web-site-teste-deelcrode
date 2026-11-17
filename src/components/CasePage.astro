@@ -6,6 +6,7 @@ import Contact from './sections/Contact.astro';
 import SplitText from './SplitText.astro';
 import type { CaseStudy } from '@/data/cases';
 import { getDictionary, localizePath, sectionId, type Locale } from '@/i18n';
+import { withBase } from '@/lib/url';
 import { renderInline } from '@/lib/inline';
 
 interface Props {
@@ -17,7 +18,7 @@ const { lang, study } = Astro.props;
 const dict = getDictionary(lang);
 const labels = dict.cases;
 const copy = labels.items[study.slug];
-const back = `${localizePath('/', lang)}#${sectionId(lang, 'projects')}`;
+const back = `${withBase(localizePath('/', lang))}#${sectionId(lang, 'projects')}`;
 const blocks = [
   { title: labels.context, text: copy.context },
   { title: labels.problem, text: copy.problem },
