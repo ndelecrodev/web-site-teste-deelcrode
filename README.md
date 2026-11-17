@@ -75,11 +75,11 @@ O Cloudflare Pages lê `dist/_headers` (CSP, cache e cabeçalhos de segurança),
 
 O site também roda num subcaminho, como `usuario.github.io/repositorio/`. O build lê três variáveis:
 
-| Variável         | Exemplo                        | Efeito                                         |
-| ---------------- | ------------------------------ | ---------------------------------------------- |
-| `SITE_URL`       | `https://ndelecrodev.github.io` | origem usada em canonical, OG e sitemap        |
-| `BASE_PATH`      | `/web-site-teste-deelcrode`    | prefixo de todos os links e arquivos           |
-| `PUBLIC_NOINDEX` | `true`                         | marca as páginas como `noindex` (cópia de teste) |
+| Variável         | Exemplo                         | Efeito                                           |
+| ---------------- | ------------------------------- | ------------------------------------------------ |
+| `SITE_URL`       | `https://ndelecrodev.github.io` | origem usada em canonical, OG e sitemap          |
+| `BASE_PATH`      | `/web-site-teste-deelcrode`     | prefixo de todos os links e arquivos             |
+| `PUBLIC_NOINDEX` | `true`                          | marca as páginas como `noindex` (cópia de teste) |
 
 Sem essas variáveis o build sai para a raiz de `nicolasdelecrode.dev`. A cópia de teste é publicada enviando o conteúdo de `dist/` para a branch `gh-pages`. No GitHub Pages os arquivos `_headers` e `_redirects` não têm efeito.
 
